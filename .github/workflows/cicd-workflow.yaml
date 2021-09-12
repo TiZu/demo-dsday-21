@@ -1,0 +1,102 @@
+name: CI/CD Frontend
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    name: Build application
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+        name: Checkout sources
+      - uses: actions/setup-node@v2
+        name: Use Node.js 14
+        with:
+          node-version: '14'
+          cache: 'yarn'
+      - name: Install dependencies
+        run: yarn --frozen-lockfile
+      - name: Build node application
+        run: yarn build
+      - uses: actions/cache@v2
+        name: Cache build artifacts
+        id: restore-build
+        if: ${{ github.event_name == 'push' }}
+        with:
+          path: ./build/*
+          key: ${{ github.sha }}
+
+  infrastructure:
+    name: Deploy Azure infrastructure
+    runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'push' }}
+
+    outputs:
+      frontendstoragename: ${{ steps.armdeployment.outputs.frontendStorageName }}
+      frontendurl: ${{ steps.armdeployment.outputs.frontendStorageUrl }}
+
+    steps:
+      - uses: actions/checkout@v2
+        name: Checkout sources
+      - id: azlogin
+        name: Login to Azure
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+      - id: armdeployment
+        name: Deploy infrastructure to Azure
+        uses: azure/arm-deploy@v1
+        with:
+          subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          resourceGroupName: ${{ secrets.AZURE_RESOURCEGROUP_NAME }}
+          template: ./.github/infrastructure/main.bicep
+          parameters: storagePrefix=demods21
+          failOnStdErr: false
+      - id: enableweb
+        name: Enable static website for ${{ steps.armdeployment.outputs.frontendStorageName }}
+        uses: azure/cli@v1
+        with:
+          inlineScript: |
+            #!/bin/bash
+            az storage blob service-properties update --account-name ${{ steps.armdeployment.outputs.frontendStorageName }} --static-website --404-document index.html --index-document index.html
+      - id: azlogout
+        name: Logout from Azure
+        run: |
+          az logout
+        if: always()
+
+  deploy:
+    name: Deploy application to Azure
+    runs-on: ubuntu-latest
+    needs: [build, infrastructure]
+    if: ${{ github.event_name == 'push' }}
+
+    steps:
+      - id: azlogin
+        name: Login to Azure
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+      - uses: actions/cache@v2
+        name: Restore build artifacts from cache.
+        id: restore-build
+        with:
+          path: ./build/*
+          key: ${{ github.sha }}
+      - name: Upload to ${{ needs.infrastructure.outputs.frontendstoragename }}
+        uses: azure/CLI@v1
+        with:
+          inlineScript: |
+            az storage blob upload-batch --account-name ${{ needs.infrastructure.outputs.frontendstoragename }} -d '$web' -s ./build
+      - id: azlogout
+        name: Logout from Azure
+        run: |
+          az logout
+        if: always()
+      - name: Echo URL
+        run: echo ${{ needs.infrastructure.outputs.frontendurl }}
