@@ -15,9 +15,9 @@ jobs:
       - uses: actions/checkout@v2
         name: Checkout sources
       - uses: actions/setup-node@v2
-        name: Use Node.js 14.x
+        name: Use Node.js 14
         with:
-          node-version: 14.x
+          node-version: '14'
           cache: 'yarn'
       - name: Install dependencies
         run: yarn --frozen-lockfile
