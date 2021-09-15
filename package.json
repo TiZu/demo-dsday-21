@@ -3,15 +3,23 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "start": "react-scripts start",
+    "start": "run-p start:api start:app",
+    "start:app": "react-scripts start",
+    "start:api": "json-server --watch ./tools/data/db.json --port 3001",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "clean": "rimraf dist build"
   },
   "dependencies": {
+    "primeflex": "^3.0.1",
+    "primeicons": "^4.1.0",
+    "primereact": "^6.5.1",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
+    "react-transition-group": "^4.4.2",
+    "swr": "^1.0.1",
+    "unfetch": "^4.2.0",
     "web-vitals": "^1.0.1"
   },
   "devDependencies": {
@@ -30,9 +38,12 @@
     "eslint-plugin-prettier": "^4.0.0",
     "eslint-plugin-react": "^7.25.1",
     "eslint-plugin-react-hooks": "^4.2.0",
+    "json-server": "^0.16.3",
+    "npm-run-all": "^4.1.5",
     "prettier": "^2.4.0",
     "react-scripts": "4.0.3",
     "rimraf": "^3.0.2",
+    "sass": "^1.41.0",
     "typescript": "^4.1.2"
   },
   "browserslist": {
