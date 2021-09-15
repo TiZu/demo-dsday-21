@@ -1,9 +1,9 @@
 import React from 'react'
 
-import TodoList from './components/todos/TodoList'
+import TodoPage from './pages/TodoPage'
 
 function App(): React.ReactElement {
-  return <TodoList />
+  return <TodoPage />
 }
 
 export default App

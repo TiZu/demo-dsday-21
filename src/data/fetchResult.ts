@@ -4,5 +4,5 @@ export interface FetchResult<TData> {
   data?: TData
   isLoading: boolean
   error?: FetchError
-  mutate?: () => void
+  mutate: any
 }

@@ -5,8 +5,12 @@
 
 html,
 body {
-  margin: 0;
-  background-color: var(--surface-100);
+  margin: 2;
+  background-color: var(--surface-0);
   color: var(--text-color);
   font-family: var(--font-family);
+}
+
+.p-column-filter {
+  width: 100%;
 }
