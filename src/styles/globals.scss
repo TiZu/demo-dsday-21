@@ -1,0 +1,16 @@
+@import 'primereact/resources/themes/saga-blue/theme.css';
+@import 'primereact/resources/primereact.min.css';
+@import 'primeicons/primeicons.css';
+@import 'primeflex/primeflex.css';
+
+html,
+body {
+  margin: 2;
+  background-color: var(--surface-0);
+  color: var(--text-color);
+  font-family: var(--font-family);
+}
+
+.p-column-filter {
+  width: 100%;
+}
