@@ -10,25 +10,31 @@
       "text": "Do some magic",
       "id": 2,
       "deadline": "2018-07-22T12:00:00.000Z",
-      "done": true
+      "done": false
     },
     {
       "text": "Go to the gym",
       "id": 3,
       "deadline": "2018-07-24T12:00:00.000Z",
-      "done": false
+      "done": true
     },
     {
       "text": "Buy milk",
       "id": 4,
       "deadline": "2018-07-30T12:00:00.000Z",
-      "done": false
+      "done": true
     },
     {
       "text": "Eat some fruits",
       "id": 5,
       "deadline": "2018-07-29T12:00:00.000Z",
-      "done": true
+      "done": false
+    },
+    {
+      "text": "Play with React!",
+      "deadline": "2021-09-29T22:00:00.000Z",
+      "done": false,
+      "id": 6
     }
   ]
 }

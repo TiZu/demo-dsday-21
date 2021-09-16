@@ -1,6 +1,6 @@
-import React, { useRef } from 'react'
+import React, { useRef, useState } from 'react'
 
-import { ITodo } from '../../../data/todos'
+import { ITodo, emptyTodo } from '../../../data/todos'
 
 import RowGroupHeaderTemplate from './RowGroupHeaderTemplate'
 import RowGroupFooterTemplate from './RowGroupFooterTemplate'
@@ -11,6 +11,7 @@ import TableHeader from './TableHeader'
 import ActionColumnTemplate from './ActionColumnTemplate'
 import ToggleColumnTemplate from './ToggleColumnTemplate'
 import DateColumnTemplate from './DateColumnTemplate'
+import CreateEditDialog from './CreateEditDialog'
 
 interface TableProps {
   data?: ITodo[]
@@ -18,16 +19,39 @@ interface TableProps {
 }
 
 function Table({ data, mutate }: TableProps): React.ReactElement {
+  const [selectedTodo, setSelectedTodo] = useState<ITodo>(emptyTodo)
+  const [isDialogOpen, setIsDialogOpen] = useState(false)
+
   const tableRef = useRef<DataTable | null>(null)
 
-  const tableHeader = <TableHeader countTodos={data?.length || 0} />
+  const onDialogHide = (): void => {
+    setSelectedTodo(emptyTodo)
+    setIsDialogOpen(false)
+  }
+
+  const tableHeader = (
+    <TableHeader
+      countTodos={data?.length || 0}
+      onClick={() => {
+        setSelectedTodo(emptyTodo)
+        setIsDialogOpen(true)
+      }}
+    />
+  )
 
   const toggleColumnTemplate = (rowData: ITodo): React.ReactElement => (
     <ToggleColumnTemplate todo={rowData} mutate={mutate} />
   )
 
-  const actionColumnTemplate = (): React.ReactElement => (
-    <ActionColumnTemplate />
+  const actionColumnTemplate = (rowData: ITodo): React.ReactElement => (
+    <ActionColumnTemplate
+      todo={rowData}
+      mutate={mutate}
+      onEdit={() => {
+        setIsDialogOpen(true)
+        setSelectedTodo(rowData)
+      }}
+    />
   )
 
   const rowGroupHeaderTemplate = (rowData: ITodo): React.ReactElement => (
@@ -43,47 +67,55 @@ function Table({ data, mutate }: TableProps): React.ReactElement {
   )
 
   return (
-    <div>
-      <div className="card">
-        <DataTable
-          value={data}
-          ref={tableRef}
-          rowGroupMode="subheader"
-          sortMode="single"
-          sortField="done"
-          sortOrder={1}
-          groupField="done"
-          header={tableHeader}
-          rowGroupHeaderTemplate={rowGroupHeaderTemplate}
-          rowGroupFooterTemplate={rowGroupFooterTemplate}
-        >
-          <Column
-            field="done"
-            headerStyle={{ width: '5rem' }}
-            body={toggleColumnTemplate}
-          />
-          <Column field="id" header="ID" headerStyle={{ width: '5rem' }} />
-          <Column
-            field="text"
-            header="Text"
-            filter
-            filterMatchMode="contains"
-            filterPlaceholder="Type to filter todos..."
-          />
-          <Column
-            field="deadline"
-            header="Due Date"
-            headerStyle={{ width: '20rem' }}
-            body={dateColumnTemplate}
-          />
-          <Column
-            field="done"
-            headerStyle={{ width: '8rem' }}
-            body={actionColumnTemplate}
-          />
-        </DataTable>
+    <>
+      <div>
+        <div className="card">
+          <DataTable
+            value={data}
+            ref={tableRef}
+            rowGroupMode="subheader"
+            sortMode="single"
+            sortField="done"
+            sortOrder={1}
+            groupField="done"
+            header={tableHeader}
+            rowGroupHeaderTemplate={rowGroupHeaderTemplate}
+            rowGroupFooterTemplate={rowGroupFooterTemplate}
+          >
+            <Column
+              field="done"
+              headerStyle={{ width: '5rem' }}
+              body={toggleColumnTemplate}
+            />
+            <Column field="id" header="ID" headerStyle={{ width: '5rem' }} />
+            <Column
+              field="text"
+              header="Text"
+              filter
+              filterMatchMode="contains"
+              filterPlaceholder="Type to filter todos..."
+            />
+            <Column
+              field="deadline"
+              header="Due Date"
+              headerStyle={{ width: '20rem' }}
+              body={dateColumnTemplate}
+            />
+            <Column
+              field="done"
+              headerStyle={{ width: '8rem' }}
+              body={actionColumnTemplate}
+            />
+          </DataTable>
+        </div>
       </div>
-    </div>
+      <CreateEditDialog
+        todo={selectedTodo}
+        isOpen={isDialogOpen}
+        mutate={mutate}
+        onHide={onDialogHide}
+      />
+    </>
   )
 }
 

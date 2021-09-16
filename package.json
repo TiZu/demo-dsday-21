@@ -12,7 +12,9 @@
     "clean": "rimraf dist build"
   },
   "dependencies": {
+    "classnames": "^2.3.1",
     "date-fns": "^2.23.0",
+    "formik": "^2.2.9",
     "primeflex": "^3.0.1",
     "primeicons": "^4.1.0",
     "primereact": "^6.5.1",

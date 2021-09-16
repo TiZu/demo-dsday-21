@@ -67,3 +67,24 @@ export async function putWithBaseUrl(url: string, data: any): Promise<any> {
 
   return await response.json()
 }
+
+export async function deleteWithBaseUrl(url: string): Promise<any> {
+  const fullUrl = `${baseUrl}${url}`
+
+  const response = await fetch(fullUrl, {
+    method: 'DELETE',
+  })
+
+  if (!response.ok) {
+    const fetchError = new FetchError('Error performing post request.')
+    fetchError.statusCode = response.status
+    fetchError.statusText = response.statusText
+
+    const result = await response.json()
+    fetchError.details = result ? JSON.stringify(result) : undefined
+
+    throw fetchError
+  }
+
+  return await response.json()
+}
