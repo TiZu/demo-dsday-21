@@ -1,6 +1,12 @@
 export interface ITodo {
   id?: number
-  deadline?: Date
+  deadline: Date
   text?: string
-  done?: boolean
+  done: boolean
+}
+
+export const emptyTodo: ITodo = {
+  text: '',
+  deadline: new Date(),
+  done: false,
 }
